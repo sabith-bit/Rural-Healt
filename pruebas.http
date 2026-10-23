@@ -1,0 +1,66 @@
+@host = http://localhost:8080/api
+
+### 1. Catálogos
+GET {{host}}/sintomas
+
+###
+GET {{host}}/reglas-triaje
+
+### 2. Crear paciente
+POST {{host}}/pacientes
+Content-Type: application/json
+
+{
+  "tipoDocumento": "CC",
+  "documento": "1100123456",
+  "nombres": "María",
+  "apellidos": "Pérez Gómez",
+  "fechaNacimiento": "1985-03-12",
+  "sexo": "F",
+  "telefono": "3001234567",
+  "veredaDireccion": "Vereda La Esperanza",
+  "antecedentes": "Ninguno conocido"
+}
+
+### 3. Abrir atención (idUsuario 3 = enfermería de prueba)
+POST {{host}}/atenciones
+Content-Type: application/json
+
+{
+  "idPaciente": 1,
+  "idUsuario": 3,
+  "motivo": "Dificultad para respirar desde la madrugada"
+}
+
+### 4. Registrar signos vitales
+POST {{host}}/atenciones/1/signos
+Content-Type: application/json
+
+{
+  "idUsuario": 3,
+  "temperatura": 38.2,
+  "frecuenciaCardiaca": 110,
+  "frecuenciaRespiratoria": 26,
+  "presionSistolica": 120,
+  "presionDiastolica": 80,
+  "saturacionO2": 88,
+  "pesoKg": 62.5
+}
+
+### 5. Registrar síntomas (2 = Dificultad respiratoria, 3 = Fiebre)
+PUT {{host}}/atenciones/1/sintomas
+Content-Type: application/json
+
+{ "sintomaIds": [2, 3] }
+
+### 6. Ejecutar triaje (debe dar ROJA por saturación < 90)
+POST {{host}}/atenciones/1/triaje
+Content-Type: application/json
+
+{ "idUsuario": 3 }
+
+### 7. Cola de atención ordenada por prioridad
+GET {{host}}/atenciones/cola
+
+### 8. Historial del paciente
+GET {{host}}/pacientes/1/atenciones
